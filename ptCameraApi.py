@@ -1,3 +1,6 @@
+# Pan/Tilt Camera API
+# Chris Jones
+
 import requests
 import json
 import urllib
@@ -5,6 +8,10 @@ import time
 
 # IP address and port used to communicate with the camera                 
 camera_url = 'http://192.168.200.158:5000'
+
+# Last commanded position of the camera
+last_commanded_pos = [0,0]
+
 
 # Set a different camera IP address and port programatically
 # url - the camera IP address and port to set
@@ -47,7 +54,18 @@ def set_light(led):
 # return - 0 for success, -1 for failure
 def move_camera(x, y):
 	cmd_string = '{"T":133,"X":%s,"Y":%s}' % (x,y)
-	return send_command(cmd_string)
+	rc = send_command(cmd_string)
+
+	if rc is 0:
+		last_commanded_pos[0] = x
+		last_commanded_pos[1] = y
+
+	return rc
+
+
+# Get the last successfully commanded position of the camera
+def get_last_commanded_pos():
+	return last_commanded_pos
 
 
 # List the names of pictures onboard the camera
